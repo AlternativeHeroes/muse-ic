@@ -5,12 +5,13 @@
 """
 Take some wav files, get the spectrum
 """
-
+from __future__ import division
 import sys
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from scipy.fftpack import fft
 from scipy.fftpack import fftfreq
 from scipy.io import wavfile
+import pandas
 import numpy as np
 
 '''
@@ -50,7 +51,8 @@ def analyze(music, bitdepth=None, bitrate=44100, sample_time=1/6.0):
         end = int(start + sample_time * bitrate)
         n = end - start
 
-        print("Analyzing [%d, %d)" % (start, end), file=sys.stderr)
+        # print("Analyzing [%d, %d)" % (start, end), file=sys.stderr)
+        print "Analyzing [%d, %d)" % (start, end)
         spectrum = fft(normed[start:end])
         spectrum = 2 / n * np.abs(spectrum[0:int(n / 2)])[1:]
 
@@ -69,7 +71,7 @@ def analyze(music, bitdepth=None, bitrate=44100, sample_time=1/6.0):
         pairs = np.array([freqs, spectrum]).T
         samples.append(pairs)
 
-    return samples
+    return samples[:-1]
 
 '''
     Load a wave file into memory.
@@ -106,8 +108,37 @@ def make_sin():
     sf = 1 / T
     return sf, y
 
+'''
+    Get the frequency for a given piano key
+'''
+def f(n):
+    return 440 * 2 ** ((float(n)-49) / 12)
+
+ranges = [0] + [f(n + 0.5) for n in range(0,89)]
+log2 = np.log(2)
+thirteenlog2 = 13 * log2
+
+'''
+    Get the piano key for a given frequency
+'''
+def finv(freq):
+    return (12 * np.log(freq/55) + thirteenlog2) / log2
+
+'''
+    sample is an array of (freq, amp)
+'''
+def processSample(sample, id=None):
+    processed = np.zeros(90)
+    for freq, amp in sample:
+        key = min(max(int(np.round((finv(freq)))), 0), 89)
+        processed[key] = processed[key] + amp
+    print "Done with sample", id
+    return processed
+
+
 if __name__ == "__main__":
     sf, music = load_wav(sys.argv[1])
     music = middle_30(music)
     analysis = analyze(music, bitrate=sf)
-    print(analysis)
+    processed = [processSample(sample, id) for id, sample in enumerate(analysis)]
+    
