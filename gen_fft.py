@@ -81,6 +81,15 @@ def load_wav(path):
     return wavfile.read(path)
 
 '''
+    get the middle 30 seconds of the song
+'''
+def middle_30(music, samplerate):
+    samples = 30 * samplerate
+    start = int((len(music) / 2) - (samples / 2))
+    stop = int(start + (samples / 2))
+    return music[start:stop, :]
+
+'''
     Create a test sin wave.
     This wave is built up of a 50Hz and an 80Hz signal.
 
@@ -99,5 +108,6 @@ def make_sin():
 
 if __name__ == "__main__":
     sf, music = load_wav(sys.argv[1])
+    music = middle_30(music)
     analysis = analyze(music, bitrate=sf)
     print(analysis)
