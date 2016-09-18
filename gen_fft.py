@@ -86,7 +86,7 @@ def load_wav(path):
 '''
 def middle_30(music, samplerate):
     print("Getting the middle 30 seconds of the song")
-    samples = 30 * samplerate * len(music.shape)
+    samples = 10 * samplerate * len(music.shape)
     start = int((len(music) / 2) - (samples / 2))
     stop = int(start + (samples / 2))
     return music[start:stop, :]
@@ -145,6 +145,14 @@ def unbucketSample(processed, keymap, nfreqs=3674, id=None):
         unbucket[keymap[key]] = amp
     return unbucket
 
+def reproduceSong(series):
+    song = []
+    for spectrum in series:
+        ift = ifft(spectrum)
+        # print ift.shape --> 3674 aka 1/6 our new bitrate
+        song = np.concatenate([song, ift])
+    song = np.array((np.array(song).real) * (1 << 15), dtype='int8')
+    return song
 
 if __name__ == "__main__":
     import md5
@@ -184,4 +192,6 @@ if __name__ == "__main__":
     print keymap
     unbucketed = [unbucketSample(sample, keymap, nfreqs=len(freqs), id=id) for sample in bucketed]
     outputData = pandas.DataFrame(unbucketed)
-    # reproducedSong = reproduceSong(unbucketed)
+    song = reproduceSong(unbucketed)
+    print song
+    wavfile.write("NEW_" + file_name + ".wav", 3674*6, song)
