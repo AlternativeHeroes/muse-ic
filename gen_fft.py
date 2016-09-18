@@ -146,5 +146,5 @@ if __name__ == "__main__":
     dataFrame = pandas.DataFrame(processed)
     hash_file = md5.new()
     hash_file.update(sys.argv[1])
-    file_name = hash_file.digest().encode('base64').strip() + ".csv"
+    file_name = hash_file.digest().encode('base64').replace("/", "").replace("=", "").strip() + ".csv"
     dataFrame.to_csv(file_name, index=False, index_label=False, header=False)
