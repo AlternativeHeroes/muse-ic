@@ -37,7 +37,7 @@ def analyze(music, bitdepth=None, bitrate=44100, sample_time=1/6.0):
     if len(music.shape) > 1:
         mono = np.mean(music, axis = 1)
 
-    # Normalize to [1, 1)
+    # Normalize to [-1, 1)
     print("Normalizing music to standard volume")
     normed = mono / (1 << (bitdepth - 1))
 
@@ -86,7 +86,8 @@ def load_wav(path):
     get the middle 30 seconds of the song
 '''
 def middle_30(music, samplerate):
-    samples = 30 * samplerate
+    print("Getting the middle 30 seconds of the song")
+    samples = 30 * samplerate * len(music.shape)
     start = int((len(music) / 2) - (samples / 2))
     stop = int(start + (samples / 2))
     return music[start:stop, :]
