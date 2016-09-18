@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 # vim:fenc=utf-8
 
@@ -138,9 +138,13 @@ def processSample(sample, id=None):
 
 
 if __name__ == "__main__":
+    import md5
     sf, music = load_wav(sys.argv[1])
     music = middle_30(music, sf)
     analysis = analyze(music, bitrate=sf)
     processed = [processSample(sample, id) for id, sample in enumerate(analysis)]
     dataFrame = pandas.DataFrame(processed)
-    dataFrame.to_csv(sys.argv[1] + '.csv', index=False, index_label=False, header=False)
+    hash_file = md5.new()
+    hash_file.update(sys.argv[1])
+    file_name = hash_file.digest().encode('base64').strip() + ".csv"
+    dataFrame.to_csv(file_name, index=False, index_label=False, header=False)
