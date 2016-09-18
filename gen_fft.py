@@ -138,7 +138,6 @@ def processSample(sample, id=None):
 
 if __name__ == "__main__":
     sf, music = load_wav(sys.argv[1])
-    music = middle_30(music)
+    music = middle_30(music, sf)
     analysis = analyze(music, bitrate=sf)
     processed = [processSample(sample, id) for id, sample in enumerate(analysis)]
-    
