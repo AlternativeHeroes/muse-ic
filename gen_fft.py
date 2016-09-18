@@ -141,3 +141,5 @@ if __name__ == "__main__":
     music = middle_30(music, sf)
     analysis = analyze(music, bitrate=sf)
     processed = [processSample(sample, id) for id, sample in enumerate(analysis)]
+    dataFrame = pandas.DataFrame(processed)
+    dataFrame.to_csv(sys.argv[1] + '.csv', index=False, index_label=False, header=False)
